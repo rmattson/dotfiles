@@ -1,3 +1,9 @@
+" A lot of disparate sources have been collected into this config.
+" I should have kept track of where I got the info, but I didn't.
+" Perhaps I'll dig some of the sources up and log them here
+" for posterity. If your settings are reproduced here, thank you.
+
+
 set encoding=utf-8      "file encoding
 set scrolloff=3         "number of lines of context above/below cursor
 set showmode            "shows the current edit mode
