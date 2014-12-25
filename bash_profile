@@ -1,12 +1,12 @@
-# If not running interactively, don't do anything
-[[ $- != *i* ]] && return
+#
+# ~/.bash_profile
+#
 
-# Check for running osx and add brew-specific to path
-if [ "$(uname)" == "Darwin" ]; then 
-	export PATH=$(brew --prefix coreutils)/libexec/gnubin:$PATH
+export HISTCONTROL=ignoredups:ignorespace
+
+if [ -f ~/.bashrc ]; then
+   source ~/.bashrc
 fi
-
-export PATH=~/bin:/usr/local/bin:$PATH
 
 export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[34;1m\]\w\[\033[m\]\$ "
 export CLICOLOR=1
