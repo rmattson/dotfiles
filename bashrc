@@ -111,10 +111,14 @@ fi
 
 if [ "$(uname)" == "Linux" ]; then
 	VIRTUALENVWRAPPER_PYTHON='/usr/bin/python3'
-	source /usr/local/bin/virtualenvwrapper.sh
 fi
 
 if [ "$(uname)" == "Darwin" ]; then
 	VIRTUALENVWRAPPER_PYTHON='/usr/local/bin/python3'
-	source /usr/local/bin/virtualenvwrapper.sh
 fi
+
+if [ -f "/usr/local/bin/virtualenvwrapper.sh" ];
+then
+    source /usr/local/bin/virtualenvwrapper.sh
+fi
+
