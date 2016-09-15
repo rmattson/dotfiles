@@ -30,6 +30,7 @@ set foldclose=          "turn off automatic foldclosing
 set autochdir           "change the cwd to the same dir the cur file is in
 
 " indenting
+set tabstop=4
 set expandtab           "expand insert # spaces that makes a tab
 set shiftwidth=4        "4 spaces for shifting
 set softtabstop=4       "tabs are 4 spaces
