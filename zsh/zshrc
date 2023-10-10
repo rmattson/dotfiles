@@ -101,6 +101,8 @@ alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
 alias regrefresh="regolith-look refresh"
 alias vim="nvim"
+alias wi="wezterm imgcat"
+alias i="w3m"
 
 # bun completions
 [ -s "/home/ryan/.bun/_bun" ] && source "/home/ryan/.bun/_bun"
