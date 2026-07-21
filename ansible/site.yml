@@ -16,5 +16,14 @@
       ansible.builtin.include_tasks: tasks/macos.yml
       when: ansible_facts['os_family'] == 'Darwin'
 
+    - name: Install User Fonts
+      ansible.builtin.include_tasks: tasks/fonts.yml
+
+    - name: Install Starship prompt
+      ansible.builtin.include_tasks: tasks/starship.yml
+    
+    - name: Set up Zsh plugins
+      ansible.builtin.include_tasks: tasks/zsh.yml
+
     - name: Stow dotfiles
       ansible.builtin.include_tasks: tasks/stow.yml

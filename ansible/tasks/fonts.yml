@@ -1,0 +1,41 @@
+---
+# --- FEDORA / LINUX SETUP ---
+- name: Check if JetBrainsMono Nerd Font is installed on Linux
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['user_dir'] }}/.local/share/fonts/JetBrainsMonoNerdFont-Regular.ttf"
+  register: font_check
+  when: ansible_facts['os_family'] != 'Darwin'
+
+- name: Download and install JetBrainsMono Nerd Font on Linux
+  when: 
+    - ansible_facts['os_family'] != 'Darwin'
+    - not font_check.stat.exists
+  block:
+    - name: Ensure local fonts directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.local/share/fonts"
+        state: directory
+        mode: '0755'
+
+    - name: Download JetBrainsMono Nerd Font release zip
+      ansible.builtin.get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
+        dest: /tmp/JetBrainsMono.zip
+        mode: '0644'
+
+    - name: Extract font files to ~/.local/share/fonts
+      ansible.builtin.unarchive:
+        src: /tmp/JetBrainsMono.zip
+        dest: "{{ ansible_facts['user_dir'] }}/.local/share/fonts"
+        remote_src: yes
+
+    - name: Refresh font cache (fc-cache)
+      ansible.builtin.command: fc-cache -f
+      changed_when: true
+
+  always:
+    - name: Clean up font zip file
+      ansible.builtin.file:
+        path: /tmp/JetBrainsMono.zip
+        state: absent
+      when: ansible_facts['os_family'] != 'Darwin'

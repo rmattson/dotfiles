@@ -1,4 +1,17 @@
 ---
+- name: Ensure DNF plugins are installed
+  become: true
+  ansible.builtin.dnf:
+    name: dnf-plugins-core
+    state: present
+
+- name: Enable COPR repositories
+  become: true
+  community.general.copr:
+    name: "{{ item }}"
+    state: enabled
+  loop: "{{ fedora_copr_repos }}"
+
 - name: Install common CLI tools on Fedora
   become: true
   ansible.builtin.dnf:

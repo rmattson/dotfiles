@@ -1,0 +1,26 @@
+---
+- name: Check if Starship is installed
+  ansible.builtin.command: which starship
+  register: starship_check
+  changed_when: false
+  failed_when: false
+
+- name: Install Starship via official install script
+  when: starship_check.rc != 0
+  block:
+    - name: Download Starship installer
+      ansible.builtin.get_url:
+        url: "{{ starship_install_script }}"
+        dest: /tmp/starship_install.sh
+        mode: '0755'
+
+    - name: Execute Starship installer
+      ansible.builtin.command:
+        cmd: /tmp/starship_install.sh -y
+      become: true
+
+  always:
+    - name: Clean up installer script
+      ansible.builtin.file:
+        path: /tmp/starship_install.sh
+        state: absent

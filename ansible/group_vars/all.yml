@@ -1,22 +1,56 @@
 ---
 # Packages with identical names across dnf and brew
 common_packages:
+  - curl
   - stow
   - neovim
   - ripgrep
   - bottom
   - tmux
   - git
+  - ghostty # Needs COPR for Fedora
+  - lazygit # Needs COPR for Fedora
+  - gcc
+  - clang
+  - llvm
+  - lldb
+  - rustup
+  - git-lfs
 
 # Packages with OS-specific package names
 fedora_specific_packages:
   - fd-find
+  - golang
+  - odin-lang
 
 macos_specific_packages:
   - fd
+  - go
+  - font-jetbrains-mono-nerd-font
+  - odin
+
+# Fedora COPR repos
+fedora_copr_repos:
+  - scottames/ghostty
+  - dejan/lazygit
+  - sisyphus1813/odin-lang
+
+# Additional installers
+starship_install_script: "https://starship.rs/install.sh"
 
 # Dotfile packages to stow
 stow_packages:
   - nvim
   - zsh
   - tmux
+  - ghostty
+
+# Zsh plugins
+zsh_plugins:
+  - name: zsh-autosuggestions
+    repo: "https://github.com/zsh-users/zsh-autosuggestions.git"
+    dest: "{{ ansible_facts['user_dir'] }}/.zsh/zsh-autosuggestions"
+
+  - name: zsh-syntax-highlighting
+    repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    dest: "{{ ansible_facts['user_dir'] }}/.zsh/zsh-syntax-highlighting"
