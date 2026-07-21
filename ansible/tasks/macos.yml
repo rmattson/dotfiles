@@ -1,0 +1,16 @@
+---
+- name: Ensure Homebrew is installed
+  ansible.builtin.stat:
+    path: /opt/homebrew/bin/brew
+  register: homebrew_check
+
+- name: Fail if Homebrew is missing
+  ansible.builtin.fail:
+    msg: "Please install Homebrew on macOS before running this playbook: https://brew.sh"
+  when: not homebrew_check.stat.exists
+
+- name: Install CLI tools via Homebrew
+  community.general.homebrew:
+    name: "{{ common_packages + macos_specific_packages }}"
+    state: present
+    update_head: yes

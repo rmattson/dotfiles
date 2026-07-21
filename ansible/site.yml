@@ -1,0 +1,20 @@
+---
+- name: Provision Developer Workstation
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+
+  vars_files:
+    - group_vars/all.yml
+
+  tasks:
+    - name: Include Fedora setup tasks
+      ansible.builtin.include_tasks: tasks/fedora.yml
+      when: ansible_facts['distribution'] == 'Fedora'
+
+    - name: Include macOS setup tasks
+      ansible.builtin.include_tasks: tasks/macos.yml
+      when: ansible_facts['os_family'] == 'Darwin'
+
+    - name: Stow dotfiles
+      ansible.builtin.include_tasks: tasks/stow.yml

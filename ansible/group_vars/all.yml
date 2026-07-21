@@ -1,0 +1,22 @@
+---
+# Packages with identical names across dnf and brew
+common_packages:
+  - stow
+  - neovim
+  - ripgrep
+  - bottom
+  - tmux
+  - git
+
+# Packages with OS-specific package names
+fedora_specific_packages:
+  - fd-find
+
+macos_specific_packages:
+  - fd
+
+# Dotfile packages to stow
+stow_packages:
+  - nvim
+  - zsh
+  - tmux

@@ -1,0 +1,7 @@
+---
+- name: Install common CLI tools on Fedora
+  become: true
+  ansible.builtin.dnf:
+    name: "{{ common_packages + fedora_specific_packages }}"
+    state: present
+    update_cache: yes
