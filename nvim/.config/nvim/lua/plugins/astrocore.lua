@@ -62,8 +62,6 @@ return {
         -- navigate buffer tabs
         ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
         ["[b"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous buffer" },
-        ["<C-d>"] = { "<C-d>zz", desc = "Scroll down (centered)" },
-        ["<C-u>"] = { "<C-u>zz", desc = "Scroll up (centered)" },
 
         -- mappings seen under group name "Buffer"
         ["<Leader>bd"] = {
@@ -75,13 +73,14 @@ return {
           desc = "Close buffer from tabline",
         },
 
-
         -- tables with just a `desc` key will be registered with which-key if it's installed
         -- this is useful for naming menus
         -- ["<Leader>b"] = { desc = "Buffers" },
 
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
+        ["<C-d>"] = { "<C-d>zz", desc = "Scroll down (centered)" },
+        ["<C-u>"] = { "<C-u>zz", desc = "Scroll up (centered)" },
       },
     },
   },
