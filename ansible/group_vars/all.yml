@@ -13,7 +13,6 @@ common_packages:
   - clang
   - llvm
   - lldb
-  - rustup
   - git-lfs
   - zsh
 

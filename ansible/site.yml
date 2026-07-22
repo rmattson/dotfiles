@@ -16,6 +16,9 @@
       ansible.builtin.include_tasks: tasks/macos.yml
       when: ansible_facts['os_family'] == 'Darwin'
 
+    - name: Install Rust
+      ansible.builtin.include_tasks: tasks/rust.yml
+
     - name: Change Default Shell
       ansible.builtin.include_tasks: tasks/shell.yml
 

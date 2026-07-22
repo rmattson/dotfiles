@@ -1,0 +1,24 @@
+---
+- name: Check if Cargo is installed
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['user_dir'] }}/.cargo/bin/cargo"
+  register: cargo_check
+
+- name: Install Rust via official Rustup installer
+  when: not cargo_check.stat.exists
+  block:
+    - name: Download Rustup installer
+      ansible.builtin.get_url:
+        url: https://sh.rustup.rs
+        dest: /tmp/rustup.sh
+        mode: '0755'
+
+    - name: Run Rustup installer non-interactively
+      ansible.builtin.command:
+        cmd: /tmp/rustup.sh -y --no-modify-path
+
+  always:
+    - name: Clean up installer
+      ansible.builtin.file:
+        path: /tmp/rustup.sh
+        state: absent
