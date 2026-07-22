@@ -31,7 +31,11 @@ macos_specific_packages:
   - font-jetbrains-mono-nerd-font
   - odin
 
-# Fedora COPR repos
+# Version/URL for Fedora RPM install
+bottom_version: "0.14.6"
+bottom_rpm_url: "https://github.com/ClementTsang/bottom/releases/download/{{ bottom_version }}/bottom-{{ bottom_version }}-1.x86_64.rpm"
+
+# fedora copr repos
 fedora_copr_repos:
   - scottames/ghostty
   - dejan/lazygit

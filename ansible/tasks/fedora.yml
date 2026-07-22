@@ -12,9 +12,38 @@
     state: enabled
   loop: "{{ fedora_copr_repos }}"
 
-- name: Install common CLI tools on Fedora
+- name: Install Fedora DNF packages
   become: true
   ansible.builtin.dnf:
     name: "{{ common_packages + fedora_specific_packages }}"
     state: present
     update_cache: yes
+
+# Bottom (btm) RPM install
+- name: Check if bottom is installed
+  ansible.builtin.command: which btm
+  register: bottom_check
+  changed_when: false
+  failed_when: false
+
+- name: Install bottom via RPM release
+  when: bottom_check.rc != 0
+  block:
+    - name: Download bottom RPM package
+      ansible.builtin.get_url:
+        url: "{{ bottom_rpm_url }}"
+        dest: "/tmp/bottom-{{ bottom_version }}.rpm"
+        mode: '0644'
+    
+    - name: Install bottom RPM package
+      become: true
+      ansible.builtin.dnf:
+        name: "/tmp/bottom-{{ bottom_version }}.rpm"
+        state: present
+        disable_gpg_check: yes
+
+  always:
+    - name: Clean up RPM package installer
+      ansible.builtin.file:
+        path: "/tmp/bottom-{{ bottom_version }}.rpm"
+        state: absent
