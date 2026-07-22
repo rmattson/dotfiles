@@ -1,0 +1,18 @@
+---
+- name: Locate zsh binary
+  ansible.builtin.command: which zsh
+  register: zsh_path
+  changed_when: false
+
+- name: Set Zsh as default shell on Linux
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_facts['user_id'] }}"
+    shell: "{{ zsh_path.stdout }}"
+  when: ansible_facts['os_family'] != 'Darwin'
+
+- name: Set Zsh as default shell on macOS
+  ansible.builtin.user:
+    name: "{{ ansible_facts['user_id'] }}"
+    shell: "{{ zsh_path.stdout }}"
+  when: ansible_facts['os_family'] == 'Darwin'

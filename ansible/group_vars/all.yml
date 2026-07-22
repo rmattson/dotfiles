@@ -16,12 +16,14 @@ common_packages:
   - lldb
   - rustup
   - git-lfs
+  - zsh
 
 # Packages with OS-specific package names
 fedora_specific_packages:
   - fd-find
   - golang
   - odin-lang
+  - util-linux-user
 
 macos_specific_packages:
   - fd

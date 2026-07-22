@@ -16,6 +16,9 @@
       ansible.builtin.include_tasks: tasks/macos.yml
       when: ansible_facts['os_family'] == 'Darwin'
 
+    - name: Change Default Shell
+      ansible.builtin.include_tasks: tasks/shell.yml
+
     - name: Install User Fonts
       ansible.builtin.include_tasks: tasks/fonts.yml
 
