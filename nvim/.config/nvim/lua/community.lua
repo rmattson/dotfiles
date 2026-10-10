@@ -11,5 +11,10 @@ return {
   { import = "astrocommunity.pack.go" },
   { import = "astrocommunity.pack.rust" },
   { import = "astrocommunity.pack.python" },
+  { import = "astrocommunity.note-taking.neorg" },
+  { import = "astrocommunity.workflow.precognition-nvim" },
+  { import = "astrocommunity.editing-support.multiple-cursors-nvim" },
+  { import = "astrocommunity.colorscheme.nordic-nvim"},
+  { import = "astrocommunity.bars-and-lines.dropbar-nvim"},
   -- import/override with your plugins folder
 }

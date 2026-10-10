@@ -93,7 +93,13 @@ return {
         -- ["<C-S>"] = false,
         ["<C-d>"] = { "<C-d>zz", desc = "Scroll down (centered)" },
         ["<C-u>"] = { "<C-u>zz", desc = "Scroll up (centered)" },
+        ["<S-T>"] = {
+          function()
+            require("precognition").toggle()
+          end,
+          desc = "Precognition toggle"
+        },
       },
     },
-  },
+  }
 }

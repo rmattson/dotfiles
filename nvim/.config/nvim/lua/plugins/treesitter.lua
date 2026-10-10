@@ -18,6 +18,8 @@ return {
         "lua",
         "vim",
         "odin",
+        "norg",
+        "norg_meta",
         -- add more arguments for adding more treesitter parsers
       },
     },
