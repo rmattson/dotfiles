@@ -10,7 +10,6 @@ common_packages:
   - ghostty # Needs COPR for Fedora
   - lazygit # Needs COPR for Fedora
   - gcc
-  - clang
   - llvm
   - lldb
   - git-lfs
@@ -18,6 +17,7 @@ common_packages:
 
 # Packages with OS-specific package names
 fedora_specific_packages:
+  - clang
   - fd-find
   - golang
   - odin-lang

@@ -12,7 +12,11 @@
   when: ansible_facts['os_family'] != 'Darwin'
 
 - name: Set Zsh as default shell on macOS
-  ansible.builtin.user:
-    name: "{{ ansible_facts['user_id'] }}"
-    shell: "{{ zsh_path.stdout }}"
-  when: ansible_facts['os_family'] == 'Darwin'
+  become: true
+  ansible.builtin.command: >-
+    dscl . -change /Users/{{ ansible_facts['user_id'] }} UserShell
+    {{ ansible_facts['user_shell'] }} {{ zsh_path.stdout }}
+  when: ansible_facts['os_family'] == 'Darwin' and
+        ansible_facts['user_shell'].split('/')[-1] != 'zsh'
+  # shortcut: skipped while login shell is already zsh; setup.sh only passes
+  # -K on Linux, so run setup.sh with -K manually if this ever needs to fire

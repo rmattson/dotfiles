@@ -1,7 +1,7 @@
 ---
 - name: Restow dotfile packages
   ansible.builtin.command:
-    cmd: "stow -R {{ item }}"
+    cmd: "stow -R --adopt {{ item }}"
     chdir: "{{ playbook_dir }}/.."
   loop: "{{ stow_packages }}"
   register: stow_result

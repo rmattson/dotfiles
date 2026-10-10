@@ -13,4 +13,4 @@
   community.general.homebrew:
     name: "{{ common_packages + macos_specific_packages }}"
     state: present
-    update_head: yes
+    update_homebrew: yes
