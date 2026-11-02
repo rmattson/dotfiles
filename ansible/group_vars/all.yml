@@ -22,6 +22,8 @@ fedora_specific_packages:
   - golang
   - odin-lang
   - util-linux-user
+  - unzip # needed by the bun installer
+  - yazi # Needs COPR for Fedora
 
 macos_specific_packages:
   - fd
@@ -38,9 +40,34 @@ fedora_copr_repos:
   - scottames/ghostty
   - dejan/lazygit
   - sisyphus1813/odin-lang
+  - lihaohong/yazi
 
 # Additional installers
 starship_install_script: "https://starship.rs/install.sh"
+
+# User-level toolchains installed from upstream install scripts.
+# marker: path that means it is already installed (checked with stat)
+cli_installers:
+  - name: bun
+    marker: "{{ ansible_facts['user_dir'] }}/.bun/bin/bun"
+    installer: "curl -fsSL https://bun.sh/install | bash"
+  - name: pixi
+    marker: "{{ ansible_facts['user_dir'] }}/.pixi/bin/pixi"
+    installer: "curl -fsSL https://pixi.sh/install.sh | sh"
+  - name: opencode
+    marker: "{{ ansible_facts['user_dir'] }}/.opencode/bin/opencode"
+    installer: "curl -fsSL https://opencode.ai/install | bash"
+
+# GPU stack (tasks/gpu.yml only runs it when an NVIDIA GPU is present)
+rpmfusion_release_urls:
+  - "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_facts['distribution_major_version'] }}.noarch.rpm"
+  - "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ ansible_facts['distribution_major_version'] }}.noarch.rpm"
+nvidia_packages:
+  - akmod-nvidia
+  - xorg-x11-drv-nvidia-cuda
+  - cuda-toolkit
+miniforge_installer_url: "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
+cuda_build_env: cudabuild
 
 # Dotfile packages to stow
 stow_packages:

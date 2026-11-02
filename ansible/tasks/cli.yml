@@ -1,0 +1,17 @@
+---
+- name: Check which CLI toolchains are installed
+  ansible.builtin.stat:
+    path: "{{ item.marker }}"
+  loop: "{{ cli_installers }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: cli_checks
+
+- name: Install missing CLI toolchains
+  ansible.builtin.shell:
+    cmd: "{{ item.item.installer }}"
+  loop: "{{ cli_checks.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: not item.stat.exists
+  changed_when: true

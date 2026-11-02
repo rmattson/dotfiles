@@ -25,6 +25,12 @@
     - name: Install User Fonts
       ansible.builtin.include_tasks: tasks/fonts.yml
 
+    - name: Install GPU toolchains (NVIDIA machines only)
+      ansible.builtin.include_tasks: tasks/gpu.yml
+
+    - name: Install user-level CLI toolchains
+      ansible.builtin.include_tasks: tasks/cli.yml
+
     - name: Install Starship prompt
       ansible.builtin.include_tasks: tasks/starship.yml
     

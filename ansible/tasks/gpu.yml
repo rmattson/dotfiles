@@ -1,0 +1,95 @@
+---
+# GPU stack: NVIDIA driver (RPM Fusion nonfree) + CUDA toolkit (NVIDIA repo) +
+# Miniforge with a CUDA build env. Skipped on machines without NVIDIA hardware.
+- name: Detect NVIDIA hardware
+  ansible.builtin.shell:
+    cmd: grep -qs 0x10de /sys/bus/pci/devices/*/vendor
+  changed_when: false
+  failed_when: nvidia_check.rc not in [0, 1]
+  register: nvidia_check
+
+- name: Install NVIDIA GPU toolchains
+  when: nvidia_check.rc == 0 and ansible_facts['os_family'] == 'RedHat'
+  block:
+    - name: Check if RPM Fusion nonfree is configured
+      ansible.builtin.stat:
+        path: /etc/yum.repos.d/rpmfusion-nonfree.repo
+      register: rpmfusion_check
+
+    - name: Add RPM Fusion repositories
+      when: not rpmfusion_check.stat.exists
+      block:
+        - name: Download RPM Fusion release packages
+          ansible.builtin.get_url:
+            url: "{{ item }}"
+            dest: "/tmp/{{ item | basename }}"
+            mode: '0644'
+          loop: "{{ rpmfusion_release_urls }}"
+
+        - name: Install RPM Fusion release packages
+          become: true
+          ansible.builtin.dnf:
+            name: "/tmp/{{ item | basename }}"
+            state: present
+            disable_gpg_check: yes # RPM Fusion's signing key is not in the rpmdb yet
+          loop: "{{ rpmfusion_release_urls }}"
+
+        - name: Clean up RPM Fusion release packages
+          ansible.builtin.file:
+            path: "/tmp/{{ item | basename }}"
+            state: absent
+          loop: "{{ rpmfusion_release_urls }}"
+
+    - name: Add the NVIDIA CUDA repository
+      become: true
+      ansible.builtin.yum_repository:
+        name: "cuda-fedora{{ ansible_facts['distribution_major_version'] }}"
+        description: "NVIDIA CUDA repository for Fedora"
+        baseurl: "https://developer.download.nvidia.com/compute/cuda/repos/fedora{{ ansible_facts['distribution_major_version'] }}/x86_64/"
+        gpgcheck: true
+        gpgkey: "https://developer.download.nvidia.com/compute/cuda/repos/fedora{{ ansible_facts['distribution_major_version'] }}/x86_64/73CD9B30.pub"
+
+    # akmods builds kmod-nvidia after the transaction; load it with a reboot.
+    - name: Install NVIDIA driver and CUDA toolkit
+      become: true
+      ansible.builtin.dnf:
+        name: "{{ nvidia_packages }}"
+        state: present
+
+    - name: Check if Miniforge is installed
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['user_dir'] }}/miniforge3/bin/mamba"
+      register: miniforge_check
+
+    - name: Install Miniforge
+      when: not miniforge_check.stat.exists
+      block:
+        - name: Download Miniforge installer
+          ansible.builtin.get_url:
+            url: "{{ miniforge_installer_url }}"
+            dest: /tmp/Miniforge3.sh
+            mode: '0755'
+
+        - name: Run Miniforge installer
+          ansible.builtin.command:
+            cmd: "bash /tmp/Miniforge3.sh -b -p {{ ansible_facts['user_dir'] }}/miniforge3"
+          changed_when: true
+
+      always:
+        - name: Clean up Miniforge installer
+          ansible.builtin.file:
+            path: /tmp/Miniforge3.sh
+            state: absent
+
+    # shortcut: the env is reconstructed as a bare conda-forge gcc/gxx toolchain, which is
+    # what cudabuild holds on artemis; add packages there if you need more.
+    - name: Check if the CUDA build env exists
+      ansible.builtin.stat:
+        path: "{{ ansible_facts['user_dir'] }}/miniforge3/envs/{{ cuda_build_env }}"
+      register: cuda_env_check
+
+    - name: Create the CUDA build env
+      when: not cuda_env_check.stat.exists
+      ansible.builtin.command:
+        cmd: "{{ ansible_facts['user_dir'] }}/miniforge3/bin/mamba create -y -n {{ cuda_build_env }} gcc gxx"
+      changed_when: true
