@@ -4,6 +4,7 @@ common_packages:
   - curl
   - stow
   - neovim
+  - helix
   - ripgrep
   - tmux
   - git
@@ -72,6 +73,7 @@ cuda_build_env: cudabuild
 # Dotfile packages to stow
 stow_packages:
   - nvim
+  - helix
   - zsh
   - tmux
   - ghostty
