@@ -40,21 +40,59 @@
             state: absent
           loop: "{{ rpmfusion_release_urls }}"
 
-    - name: Add the NVIDIA CUDA repository
-      become: true
-      ansible.builtin.yum_repository:
-        name: "cuda-fedora{{ ansible_facts['distribution_major_version'] }}"
-        description: "NVIDIA CUDA repository for Fedora"
-        baseurl: "https://developer.download.nvidia.com/compute/cuda/repos/fedora{{ ansible_facts['distribution_major_version'] }}/x86_64/"
-        gpgcheck: true
-        gpgkey: "https://developer.download.nvidia.com/compute/cuda/repos/fedora{{ ansible_facts['distribution_major_version'] }}/x86_64/73CD9B30.pub"
-
     # akmods builds kmod-nvidia after the transaction; load it with a reboot.
-    - name: Install NVIDIA driver and CUDA toolkit
+    - name: Install NVIDIA driver packages
       become: true
       ansible.builtin.dnf:
         name: "{{ nvidia_packages }}"
         state: present
+
+    # NVIDIA lags new Fedora releases, so probe this release and the two older ones.
+    # The repo directories are browsable and carry their own <keyid>.pub file.
+    - name: Probe NVIDIA CUDA repositories
+      ansible.builtin.uri:
+        url: "https://developer.download.nvidia.com/compute/cuda/repos/fedora{{ item }}/x86_64/"
+        return_content: true
+      loop: "{{ cuda_repo_candidate_releases }}"
+      register: cuda_repo_probe
+      changed_when: false
+      failed_when: false
+
+    - name: Select the newest CUDA repository NVIDIA publishes
+      ansible.builtin.set_fact:
+        cuda_repo_release: >-
+          {{ cuda_repo_probe.results | selectattr('status', 'equalto', 200)
+             | map(attribute='item') | list | first | default('') }}
+        cuda_repo_gpg_key: >-
+          {{ cuda_repo_probe.results | selectattr('status', 'equalto', 200)
+             | map(attribute='content') | list | first | default('')
+             | regex_search('[A-F0-9]{8}\.pub') | default('73CD9B30.pub', true) }}
+
+    - name: Add the NVIDIA CUDA repository and install the CUDA toolkit
+      when: cuda_repo_release | length > 0
+      block:
+        - name: Add the NVIDIA CUDA repository
+          become: true
+          ansible.builtin.yum_repository:
+            name: "cuda-fedora{{ cuda_repo_release }}"
+            description: "NVIDIA CUDA repository for Fedora {{ cuda_repo_release }}"
+            baseurl: "https://developer.download.nvidia.com/compute/cuda/repos/fedora{{ cuda_repo_release }}/x86_64/"
+            gpgcheck: true
+            gpgkey: "https://developer.download.nvidia.com/compute/cuda/repos/fedora{{ cuda_repo_release }}/x86_64/{{ cuda_repo_gpg_key }}"
+
+        - name: Install {{ cuda_package }}
+          become: true
+          ansible.builtin.dnf:
+            name: "{{ cuda_package }}"
+            state: present
+
+    - name: Report the missing CUDA repository
+      when: cuda_repo_release | length == 0
+      ansible.builtin.debug:
+        msg: >-
+          Skipped {{ cuda_package }}: NVIDIA publishes no CUDA repository for Fedora
+          {{ ansible_facts['distribution_major_version'] }} or the older releases probed
+          ({{ cuda_repo_candidate_releases | join(', ') }}).
 
     - name: Check if Miniforge is installed
       ansible.builtin.stat:

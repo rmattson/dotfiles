@@ -66,7 +66,11 @@ rpmfusion_release_urls:
 nvidia_packages:
   - akmod-nvidia
   - xorg-x11-drv-nvidia-cuda
-  - cuda-toolkit
+
+# NVIDIA ships CUDA repos only for some Fedora releases (there is no fedora45 as of
+# 2026-11), so probe this release first and fall back to the newest older one.
+cuda_package: cuda-toolkit
+cuda_repo_candidate_releases: "{{ range(ansible_facts['distribution_major_version'] | int, (ansible_facts['distribution_major_version'] | int) - 3, -1) | map('string') | list }}"
 miniforge_installer_url: "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"
 cuda_build_env: cudabuild
 
