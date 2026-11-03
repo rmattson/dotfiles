@@ -60,6 +60,12 @@ fi
 # Anaconda reads the kickstart off this filesystem before it wipes the disk, so it needs a
 # UUID and has to stay where it is.
 mkdir -p "$(dirname "$ks_out")"
+# Reviewing the kickstart should not need root. If its directory is not writable, write the
+# same file into the current directory instead.
+if [[ $ks_only == 1 ]] && [[ ! -w $(dirname "$ks_out") ]]; then
+	echo "$ks_out needs root; writing $PWD/$(basename "$ks_out") instead"
+	ks_out=$PWD/$(basename "$ks_out")
+fi
 boot_mp=$(findmnt -n -o TARGET -T "$(dirname "$ks_out")")
 boot_uuid=$(findmnt -n -o UUID -T "$(dirname "$ks_out")") || true
 [[ -n $boot_uuid ]] || die "$boot_mp has no UUID; keep $ks_out on a filesystem that does"
